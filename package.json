@@ -1,0 +1,13 @@
+{
+  "name": "protocol",
+  "version": "0.0.4",
+  "description": "Smart contract for Dexilla",
+  "main": "index.js",
+  "repository": "https://github.com/dexilla/protocol",
+  "author": "Curbis Norris <curbis@dexilla.com>",
+  "license": "GPL-2",
+  "private": false,
+  "devDependencies": {
+    "@openzeppelin/contracts": "^4.9.1"
+  }
+}
