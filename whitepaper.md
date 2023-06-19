@@ -65,7 +65,7 @@ Through this whitepaper, we provide an in-depth understanding of Dexilla's featu
 <introduction>
 
 ## Problem Statement
-The current decentralized exchange (DEX) landscape faces numerous challenges and limitations that hinder the optimal trading experience for users. These challenges include liquidity constraints, high gas fees, scalability issues, and a lack of user control over funds.
+The current decentralized exchange (DEX) landscape faces numerous challenges and limitations that hinder the optimal trading experience for users. These challenges include liquidity constraints, high gas fees, and scalability issues.
 
 Traditional DEX platforms often struggle with limited liquidity, resulting in fragmented pools of assets available for trading. This lack of liquidity restricts trading opportunities, making it difficult to efficiently execute large trades and impacting market efficiency.
 
@@ -73,10 +73,7 @@ High gas fees on Ethereum-based DEX platforms act as a significant barrier to en
 
 Scalability issues further compound the challenges faced by traders, leading to slow transaction speeds and network congestion during peak trading periods. These delays frustrate users who expect fast and seamless trade execution.
 
-Moreover, the lack of user control over funds is a prevalent concern. Users are required to deposit their assets into smart contracts controlled by the DEX platform, introducing counterparty risk and compromising the principles of decentralization and self-custody.
-
 Addressing these challenges is crucial for improving the trading experience and driving the adoption of decentralized exchanges. Dexilla aims to overcome these limitations by providing enhanced liquidity, lower gas fees, improved scalability, and empowering users with full control over their assets.
-
 
 <problem-statement>
 
@@ -84,7 +81,9 @@ Addressing these challenges is crucial for improving the trading experience and 
 ## Solution Overview
 Dexilla offers a comprehensive solution to the challenges faced by traders on traditional DEX platforms. Our platform introduces a range of innovative features and technologies that enhance the trading experience and empower users.
 
-One of Dexilla's key strengths is its FlashMap engine, enabling lightning-fast trade execution. This cutting-edge technology ensures swift trade processing, reducing latency and providing users with a seamless trading experience.
+One of Dexilla's key strengths is its FlashMap trading engine, enabling lightning-fast trade execution. This cutting-edge technology ensures swift trade processing, reducing latency and providing users with a seamless trading experience.
+
+FlashMap is engineered to handle high volumes of trade without increasing the fees disproportionately. This means even during times of heavy market activity, traders can execute their strategies effectively without worrying about exorbitant fees.
 
 Additionally, Dexilla leverages Layer 2 scaling solutions such as zkSync and Optimism to significantly lower gas fees. By implementing cost-effective operations, users can enjoy substantial savings on transaction costs, making trading more profitable and accessible.
 
@@ -92,12 +91,9 @@ Dexilla also addresses liquidity constraints through its Horizon Liquidity proto
 
 Furthermore, Dexilla prioritizes user control by allowing traders to maintain custody of their funds. Our platform embraces the principles of decentralization, empowering users to have full control over their assets and eliminating the need for trust in third parties.
 
-With these innovative solutions, Dexilla stands as a game-changer in the DEX market, providing traders with enhanced speed, lower fees, improved liquidity, and unprecedented control over their assets.
-
 <solution-overview>
 
 ## Technology and Architecture
-Dexilla's strength lies in its advanced technology and robust architecture, which are designed to provide users with a seamless and secure trading experience.
 
 To achieve high performance and scalability, Dexilla leverages cutting-edge Layer 2 scaling solutions such as zkSync and Optimism. These solutions enable us to process a large volume of transactions off-chain, reducing congestion on the main Ethereum network and ensuring fast and efficient trade execution.
 
@@ -141,14 +137,19 @@ Transparency is a core principle at Dexilla, and we regularly provide updates on
 ## Roadmap and Future Development
 Dexilla is committed to continuous innovation and improvement. In this section, we present our roadmap and outline our future development plans for the platform.
 
+Q2, 2023 open API
 Our first milestone is the introduction of an open API, enabling developers and third-party applications to seamlessly integrate with Dexilla. This will promote ecosystem growth and enable a broader range of use cases.
 
+Q2, 2023 SDK
 To enhance the developer experience, we will also release an SDK (Software Development Kit), providing comprehensive tools and resources for building on top of Dexilla. This empowers developers to create unique applications and expand the functionality of our platform.
 
+Q3, 2023 trade bot
 Recognizing the growing demand for automated trading solutions, we are actively working on integrating trade bot capabilities into Dexilla. This will offer users advanced trading strategies and increased efficiency.
 
+Q4, 2023 chains expansion
 Scaling is a key focus for Dexilla, and we plan to expand our operations to every Layer 2 scaling solution available. This ensures seamless and cost-effective trading experiences, even during periods of high network congestion.
 
+Q4, 2023 social login
 Additionally, we are exploring the implementation of Social Login through Account Abstraction, enabling users to easily connect their social media accounts and enhance the onboarding process.
 
 Our roadmap also includes strategic partnerships and collaborations with other protocols, aiming to create synergistic ecosystems and unlock new opportunities for our users.
@@ -160,17 +161,13 @@ Please note that the roadmap and future development plans are subject to change 
 <roadmap-and-future-development>
 
 ## Market Analysis and Competition
-This section provides a comprehensive analysis of the decentralized exchange (DEX) market and identifies key competitors. Understanding the market landscape is crucial for strategically positioning Dexilla and highlighting its unique advantages and differentiating factors.
+The DEX market has experienced remarkable growth, driven by the increasing demand for decentralized and non-custodial trading solutions. As we delve into the market size, growth trends, and user preferences, we uncover the vast opportunities and challenges present in the industry.
 
-The DEX market has witnessed significant growth in recent years, driven by the demand for decentralized and non-custodial trading solutions. We analyze the market size, growth trends, and user preferences to gain insights into the opportunities and challenges present in the industry.
+In the diverse landscape of the DEX market, Dexilla sets itself apart by offering a unique trading experience that not only reduces gas fees but also provides access to professional-grade trading tools. Crucially, we feature a decentralized order book trading system, which is tailored for professional traders and offers an edge over traditional Automated Market Maker systems. This sophisticated trading infrastructure is key to our competitive advantage and underpins our ability to offer a superior trading experience.
 
-While the DEX market offers various options for traders, Dexilla sets itself apart through its unique advantages. Our lightning-fast trade execution powered by the FlashMap engine ensures swift and efficient transactions. Additionally, the integration of Layer 2 scaling solutions like zkSync and Optimism enables us to provide significantly lower gas fees and enhanced scalability.
+The key benefit of reduced gas fees, enabling a future where DEX trading is enriched with diverse opportunities and professional-grade tools. Our integration of Layer 2 scaling solutions like zkSync and Optimism allows us to significantly cut down on gas fees while enhancing scalability, a competitive edge that sets Dexilla apart.
 
-In terms of user experience, Dexilla prioritizes simplicity and intuitiveness. Our user-friendly interface and advanced trading features cater to both novice and experienced traders, ensuring a seamless trading experience for all.
-
-We recognize that competition in the DEX market is intense, with several established platforms vying for market share. However, Dexilla's innovative technology, cost-effective operations, and focus on user control position us as a formidable contender in the market. We are confident that our unique selling points and commitment to continuous improvement will differentiate us from competitors and attract a loyal user base.
-
-By conducting a comprehensive market analysis and understanding our competition, Dexilla can strategically position itself as a leading decentralized exchange that addresses existing challenges and offers a superior trading experience to users.
+In the dynamic DEX market, competition is fierce, with numerous established platforms striving for market share. Nevertheless, Dexilla stands its ground with our innovative technology, cost-effective operations, and emphasis on user control. We firmly believe that our unique selling points and commitment to continuous improvement set us apart from the competition and will help us build a loyal user base.
 
 Please note that the market analysis and competitive landscape are based on the information available at the time of writing this whitepaper and may evolve over time.
 
@@ -217,7 +214,7 @@ In conclusion, Dexilla is a groundbreaking solution for decentralized trading, a
 
 Throughout this whitepaper, we have presented the concept of decentralized exchanges and emphasized their importance in facilitating efficient and secure trading. We have highlighted the limitations and pain points experienced by traders, underscoring the need for a platform like Dexilla that offers enhanced liquidity, lower gas fees, and greater user control.
 
-Dexilla stands out from existing platforms with its unique features, such as the lightning-fast trade execution powered by the FlashMap engine and the optimized liquidity through the Horizon Liquidity protocol. Our commitment to security is evident through our partnerships with leading security firms and the integration of smart contract auditing tools like MythX.
+Furthermore, Dexilla offers a decentralized order book that ensures transparency and reliability, allowing traders to directly interact with the market without relying on a central authority. Alongside the decentralized order book, Dexilla provides pro-level trading tools that cater to the needs of professional traders, offering advanced charting capabilities, a wide range of order types, risk management tools, API integration options, and comprehensive market analysis and research resources. Dexilla's dedication to innovation and security sets it apart as a cutting-edge platform for traders seeking efficient and secure trading experiences.
 
 Looking ahead, Dexilla's development roadmap outlines our plans for continuous improvement, including the introduction of open APIs, SDKs for developers, trade bot integration, and scalability to different Layer 2 solutions. These initiatives will further enhance the user experience and expand the platform's capabilities.
 
