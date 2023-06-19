@@ -1,6 +1,7 @@
 # Dexilla Whitepaper
 
 **Author: Dexilla**
+
 **Publish Date: June 20, 2023**
 
 **Table of Contents:**
