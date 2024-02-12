@@ -3,14 +3,13 @@
 pragma solidity 0.8.19;
 
 import "./interfaces/token/IERC20.sol";
-import "./interfaces/IWETH.sol";
 import "./abstract/Multicall.sol";
 import "./abstract/SelfPermit.sol";
 import "./libraries/TransferHelper.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPermit {
+contract DexillaExchangeV6 is AccessControl, ReentrancyGuard, Multicall, SelfPermit {
     bytes32 public constant FEE_COLLECTOR_ROLE = keccak256("FEE_COLLECTOR_ROLE");
 
     uint public tradeFee = 10; // 0.1%
@@ -22,14 +21,11 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
 
     address public immutable baseToken;
     address public immutable quoteToken; // should be a USD token
-    address public immutable weth;
 
     mapping(address => mapping(uint => uint)) public bids; // owner, price, quantity
     mapping(address => mapping(uint => uint)) public asks; // owner, price, quantity
 
     bool public pausedTrading = false;
-
-    uint private _counter;
 
     // Event emitted when an order is created.
     event OrderCreated(address indexed maker, uint8 side, uint price, uint quantity);
@@ -52,12 +48,6 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
     // Event emitted when trading is paused or resumed.
     event TradingPaused(bool oldPauseTrading, bool newPauseTrading);
 
-    modifier resetCounter() {
-        // Using this modifier to deal native token transfer when using multi order execution
-        _;
-        _counter = 0;
-    }
-
     modifier whenNotPausedTrading() {
         // Pausing is a very serious situation - we revert to sound the alarms
         require(!pausedTrading, "Trading is paused");
@@ -68,15 +58,13 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @notice Contract constructor.
      * @param _baseToken The address of the base token used for trading.
      * @param _quoteToken The address of the quote token used for trading.
-     * @param _weth The address of the WETH (Wrapped Ether) token.
      * @param feeCollector The address of the fee collector.
      * @param _tradeFee The trade fee amount.
      * @dev This constructor is used to initialize the contract with the specified parameters.
      */
-    constructor(address _baseToken, address _quoteToken, address _weth, address feeCollector, uint _tradeFee) {
+    constructor(address _baseToken, address _quoteToken, address feeCollector, uint _tradeFee) {
         baseToken = _baseToken;
         quoteToken = _quoteToken;
-        weth = _weth;
         tradeFee = _tradeFee;
         BASE_TOKEN_DECIMALS = IERC20(baseToken).decimals();
         QUOTE_TOKEN_DECIMALS = IERC20(quoteToken).decimals();
@@ -89,9 +77,8 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param price The price of the order.
      * @param quantity The quantity of the order.
      * @dev This function is used to create an order. It takes the side, price, and quantity as parameters.
-     * @notice DO NOT PASS msg.value MORE THAN THE ACTUAL NEEDED AMOUNT, IT WILL BE LOST FOREVER.
      */
-    function createOrder(uint8 side, uint price, uint quantity) public payable nonReentrant whenNotPausedTrading {
+    function createOrder(uint8 side, uint price, uint quantity) public nonReentrant whenNotPausedTrading {
         _createOrder(side, price, quantity);
     }
 
@@ -105,7 +92,6 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param r The R part of the permit signature.
      * @param s The S part of the permit signature.
      * @dev This function is used to create an order with a permit, which allows spending the user's tokens.
-     * @notice DO NOT PASS msg.value MORE THAN THE ACTUAL NEEDED AMOUNT, IT WILL BE LOST FOREVER.
      */
     function createOrderWithPermit(
         uint8 side,
@@ -116,7 +102,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) external payable nonReentrant whenNotPausedTrading {
+    ) external nonReentrant whenNotPausedTrading {
         selfPermit(baseToken, allowance, deadline, v, r, s);
         _createOrder(side, price, quantity);
     }
@@ -129,7 +115,6 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param deadline The deadline for the permit signature.
      * @param signature The signature containing the permit data.
      * @dev This function is used to create an order with a permit, which allows spending the user's tokens.
-     * @notice DO NOT PASS msg.value MORE THAN THE ACTUAL NEEDED AMOUNT, IT WILL BE LOST FOREVER.
      */
     function createOrderWithPermit2(
         uint8 side,
@@ -138,7 +123,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
         uint allowance,
         uint deadline,
         bytes calldata signature
-    ) external payable nonReentrant whenNotPausedTrading {
+    ) external nonReentrant whenNotPausedTrading {
         selfPermit2(baseToken, allowance, deadline, signature);
         _createOrder(side, price, quantity);
     }
@@ -149,14 +134,13 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param price The price of the order.
      * @param quantity The quantity of the order.
      * @dev This function is used to execute an order. It takes an array of maker addresses,
-     * @notice DO NOT PASS msg.value MORE THAN THE ACTUAL NEEDED AMOUNT, IT WILL BE LOST FOREVER.
      */
     function executeOrder(
         address[] memory makers,
         uint8 side,
         uint price,
         uint quantity
-    ) public payable nonReentrant whenNotPausedTrading {
+    ) public nonReentrant whenNotPausedTrading {
         _executeOrder(makers, side, price, quantity);
     }
 
@@ -171,7 +155,6 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param r The R part of the permit signature.
      * @param s The S part of the permit signature.
      * @dev This function is used to execute an order with a permit, which allows spending the user's tokens.
-     * @notice DO NOT PASS msg.value MORE THAN THE ACTUAL NEEDED AMOUNT, IT WILL BE LOST FOREVER.
      */
     function executeOrderWithPermit(
         address[] memory makers,
@@ -183,7 +166,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
         uint8 v,
         bytes32 r,
         bytes32 s
-    ) public payable nonReentrant whenNotPausedTrading {
+    ) public nonReentrant whenNotPausedTrading {
         if (side == 0) {
             selfPermit(quoteToken, allowance, deadline, v, r, s);
         } else {
@@ -201,7 +184,6 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param deadline The deadline for the permit signature.
      * @param signature The signature containing the permit data.
      * @dev This function is used to execute an order with a permit, which allows spending the user's tokens.
-     * @notice DO NOT PASS msg.value MORE THAN THE ACTUAL NEEDED AMOUNT, IT WILL BE LOST FOREVER.
      */
     function executeOrderWithPermit2(
         address[] memory makers,
@@ -211,7 +193,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
         uint allowance,
         uint deadline,
         bytes calldata signature
-    ) public payable nonReentrant whenNotPausedTrading {
+    ) public nonReentrant whenNotPausedTrading {
         if (side == 0) {
             selfPermit2(quoteToken, allowance, deadline, signature);
         } else {
@@ -225,13 +207,8 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param price The price of the order.
      * @param desiredQuantity The desired quantity to adjust the order to.
      * @dev This function is used to adjust the size of an existing order. It takes the side, price,
-     * @notice DO NOT PASS msg.value MORE THAN THE ACTUAL NEEDED AMOUNT, IT WILL BE LOST FOREVER.
      */
-    function adjustOrderSize(
-        uint8 side,
-        uint price,
-        uint desiredQuantity
-    ) public payable nonReentrant whenNotPausedTrading {
+    function adjustOrderSize(uint8 side, uint price, uint desiredQuantity) public nonReentrant whenNotPausedTrading {
         _adjustOrderSize(side, price, desiredQuantity);
     }
 
@@ -297,9 +274,8 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param side The side of the order (0 for buy, 1 for sell).
      * @param price The price of the order.
      * @param quantity The quantity of the order.
-     * @dev The 'resetCounter' modifier resets counters after executed.
      */
-    function _createOrder(uint8 side, uint price, uint quantity) private resetCounter {
+    function _createOrder(uint8 side, uint price, uint quantity) private {
         require(side < 2, "Invalid side");
         require(price > 0, "Invalid price");
 
@@ -320,9 +296,8 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param side The side of the order (0 for buy, 1 for sell).
      * @param price The price of the order.
      * @param quantity The quantity of the order.
-     * @dev The 'resetCounter' modifier resets counters after executed.
      */
-    function _executeOrder(address[] memory makers, uint8 side, uint price, uint quantity) private resetCounter {
+    function _executeOrder(address[] memory makers, uint8 side, uint price, uint quantity) private {
         require(side < 2, "Invalid side");
 
         uint remainningQuantity = quantity;
@@ -351,17 +326,11 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
                 uint remainningToTaker = transferQuantity - fee;
                 _transfer(baseToken, msg.sender, remainningToTaker); // transfer base token from contract to maker
                 asks[makers[i]][price] -= transferQuantity;
-                if (asks[makers[i]][price] == 0) {
-                    delete asks[makers[i]][price];
-                    emit OrderCanceled(makers[i], side ^ 1, price, transferQuantity);
-                }
+                if (asks[makers[i]][price] == 0) delete asks[makers[i]][price];
                 emit OrderExecuted(makers[i], msg.sender, side, price, transferQuantity, fee);
             } else {
                 uint makerQuantity = bids[makers[i]][price];
-                if (makerQuantity == 0) {
-                    if (msg.value == 0) continue;
-                    revert("No bid found");
-                }
+                if (makerQuantity == 0) continue;
                 uint transferQuantity;
                 if (makerQuantity >= remainningQuantity) {
                     transferQuantity = remainningQuantity;
@@ -377,10 +346,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
                 uint remainningToTaker = quantityWithoutFee - fee;
                 _transfer(quoteToken, msg.sender, remainningToTaker); // transfer usd from contract to taker
                 bids[makers[i]][price] -= transferQuantity;
-                if (bids[makers[i]][price] == 0) {
-                    delete bids[makers[i]][price];
-                    emit OrderCanceled(makers[i], side ^ 1, price, transferQuantity);
-                }
+                if (bids[makers[i]][price] == 0) delete bids[makers[i]][price];
                 emit OrderExecuted(makers[i], msg.sender, side, price, transferQuantity, fee);
             }
             if (remainningQuantity == 0) break;
@@ -393,7 +359,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      * @param desiredQuantity The desired quantity to adjust the order to.
      * @dev This function assumes that the order exists and is valid. It does not perform any checks on the order's validity.
      */
-    function _adjustOrderSize(uint8 side, uint price, uint desiredQuantity) private resetCounter {
+    function _adjustOrderSize(uint8 side, uint price, uint desiredQuantity) private {
         require(side < 2, "Invalid side");
         require(desiredQuantity > 0, "Invalid amount");
 
@@ -461,12 +427,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      */
     function _transfer(address token, address to, uint amount) private {
         require(amount > 0, "Zero amount");
-        if (token == weth) {
-            IWETH(weth).withdraw(amount);
-            TransferHelper.safeTransferETH(to, amount);
-        } else {
-            TransferHelper.safeTransfer(token, to, amount);
-        }
+        TransferHelper.safeTransfer(token, to, amount);
     }
 
     /**
@@ -478,29 +439,7 @@ contract DexillaExchangeV5 is AccessControl, ReentrancyGuard, Multicall, SelfPer
      */
     function _transferFrom(address token, address from, address to, uint amount) private {
         require(amount > 0, "Zero amount");
-        if (msg.value > 0) {
-            _counter += amount;
-            require(_counter <= msg.value, "Incorrect amount");
-            if (token == weth) {
-                IWETH(weth).deposit{value: amount}();
-                if (to != address(this)) {
-                    IWETH(weth).withdraw(amount);
-                    TransferHelper.safeTransferETH(to, amount);
-                }
-            } else {
-                revert("Invalid token");
-            }
-        } else {
-            TransferHelper.safeTransferFrom(token, from, to, amount);
-        }
-    }
-
-    /**
-     *@notice Fallback function to receive Ether.
-     *@dev This function is called when the contract receives Ether.
-     */
-    receive() external payable {
-        require(msg.sender == weth, "Invalid sender");
+        TransferHelper.safeTransferFrom(token, from, to, amount);
     }
 
     /**
