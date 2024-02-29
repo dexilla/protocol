@@ -8,6 +8,6 @@
   "license": "GPL-2",
   "private": false,
   "devDependencies": {
-    "@openzeppelin/contracts": "^4.9.1"
+    "@openzeppelin/contracts": "^4.9.6"
   }
 }
